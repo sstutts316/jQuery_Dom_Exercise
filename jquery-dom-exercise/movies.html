@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movies App</title>
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+</head>
+<body>
+  <h1>Movies App</h1>
+
+  <!-- Form to add movies -->
+  <form id="movie-form">
+    <label for="title">Title:</label>
+    <input type="text" id="title" required minlength="2">
+    <label for="rating">Rating (0-10):</label>
+    <input type="number" id="rating" min="0" max="10" required>
+    <button type="submit">Add Movie</button>
+  </form>
+
+  <!-- Movies List -->
+  <div id="movies-list">
+    <h2>My Movies</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Rating</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="movies-table">
+        <!-- Movie entries will be added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Initialize an array to store movie data
+    const movies = [];
+
+    // Function to add a movie to the list
+    function addMovie(title, rating) {
+      movies.push({ title, rating });
+      updateMoviesList();
+    }
+
+    // Function to update the movies list in the DOM
+    function updateMoviesList() {
+      const $moviesTable = $("#movies-table");
+      $moviesTable.empty();
+
+      // Sort movies by title or rating (ascending)
+      const sortedMovies = [...movies];
+      sortedMovies.sort((a, b) => a.title.localeCompare(b.title));
+      // To sort by rating, replace 'a.title.localeCompare(b.title)' with 'a.rating - b.rating'
+
+      for (const movie of sortedMovies) {
+        const $row = $("<tr>");
+        $row.append(`<td>${movie.title}</td>`);
+        $row.append(`<td>${movie.rating}</td>`);
+        const $removeButton = $("<button class='remove-button'>Remove</button>");
+        $removeButton.click(function () {
+          removeMovie(movie);
+        });
+        $row.append($("<td>").append($removeButton));
+        $moviesTable.append($row);
+      }
+    }
+
+    // Function to remove a movie from the list
+    function removeMovie(movie) {
+      const index = movies.indexOf(movie);
+      if (index !== -1) {
+        movies.splice(index, 1);
+        updateMoviesList();
+      }
+    }
+
+    // Event listener for the form submission
+    $("#movie-form").submit(function (event) {
+      event.preventDefault();
+      const title = $("#title").val();
+      const rating = parseFloat($("#rating").val());
+
+      if (title.length < 2 || isNaN(rating) || rating < 0 || rating > 10) {
+        alert("Please enter a valid title (at least 2 characters) and rating (0-10).");
+        return;
+      }
+
+      addMovie(title, rating);
+      $("#title").val("");
+      $("#rating").val("");
+    });
+
+    // Initial update of movies list
+    updateMoviesList();
+  </script>
+</body>
+</html>
